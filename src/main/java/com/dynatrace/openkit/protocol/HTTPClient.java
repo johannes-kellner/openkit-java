@@ -54,6 +54,8 @@ import javax.net.ssl.X509TrustManager;
  */
 public class HTTPClient {
 
+    private static final String USER_AGENT = "User-Agent";
+
     public enum RequestType {
 
         STATUS("Status"),                // status check
@@ -197,6 +199,7 @@ public class HTTPClient {
                 connection.setConnectTimeout(CONNECT_TIMEOUT);
                 connection.setReadTimeout(READ_TIMEOUT);
                 connection.setRequestMethod(method);
+                connection.setRequestProperty(USER_AGENT, "okjava");
 
                 // gzip beacon data, if available
                 if (data != null && data.length > 0) {
@@ -261,9 +264,9 @@ public class HTTPClient {
                 ? new TimeSyncResponse(logger, "", responseCode, Collections.<String, List<String>>emptyMap())
                 : parseTimeSyncResponse(response, responseCode, connection.getHeaderFields());
         }
-        else if ((requestType.getRequestName().equals(RequestType.BEACON.getRequestName()))
-            || (requestType.getRequestName().equals(RequestType.STATUS.getRequestName()))
-            || (requestType.getRequestName().equals(RequestType.NEW_SESSION.getRequestName()))) {
+        else if (requestType.getRequestName().equals(RequestType.BEACON.getRequestName())
+            || requestType.getRequestName().equals(RequestType.STATUS.getRequestName())
+            || requestType.getRequestName().equals(RequestType.NEW_SESSION.getRequestName())) {
             return responseCode >= 400
                 ? new StatusResponse(logger, "", responseCode, Collections.<String, List<String>>emptyMap())
                 : parseStatusResponse(response, responseCode, connection.getHeaderFields());
